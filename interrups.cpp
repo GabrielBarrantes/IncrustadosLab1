@@ -11,6 +11,8 @@
 
 #ifndef PORT1_IRQHandler
 
+extern "C"
+{
 void PORT1_IRQHandler( void )                                  // Interrupt handler for port 1
 {
     if(P1->IFG & BIT1)
@@ -21,6 +23,8 @@ void PORT1_IRQHandler( void )                                  // Interrupt hand
     P1->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
     P1->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
     }
+}
+
 }
 
 #endif
