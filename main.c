@@ -1,6 +1,21 @@
 #include "msp.h"
 #include <msp432p401r.h>
 #include <stdint.h>
+//#include "interrups.c"
+
+/*
+void PORT1_IRQHandler( void )                                  // Interrupt handler for port 1
+{
+    if(P1->IFG & BIT1)
+    {
+    P1->IE &= ~BIT1;                                           // Disable interrupt for S1 (P1.1) for debouncing
+    P1->OUT ^= BIT0;                                           // Toggle LED1 (P1.0)
+    __delay_cycles(600000);                                    // Delay of 200ms
+    P1->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
+    P1->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
+    }
+}
+*/
 
 // LED1      @ P1.0
 // Button S1 @ P1.1
@@ -38,15 +53,4 @@ void main( void )
 /*
  * Implementation of Interruption functions
  */
-void PORT1_IRQHandler( void )                                // Interrupt handler for port 1
-{
-    if(P1->IFG & BIT1)
-    {
-    P1->IE &= ~BIT1;                                           // Disable interrupt for S1 (P1.1) for debouncing
-    P1->OUT ^= BIT0;                                           // Toggle LED1 (P1.0)
-    __delay_cycles(600000);                                    // Delay of 200ms
-    P1->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
-    P1->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
-    }
-}
 
