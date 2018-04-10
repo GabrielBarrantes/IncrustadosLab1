@@ -1,5 +1,5 @@
 /*
- * interrups.c
+ * interrups.cpp
  * contains the implementations of the interrutions
  *
  *  Created on: Apr 9, 2018
@@ -10,7 +10,6 @@
 #include <msp432p401r.h>
 
 #ifndef PORT1_IRQHandler
-
 extern "C"
 {
 void PORT1_IRQHandler( void )                                  // Interrupt handler for port 1
@@ -26,6 +25,5 @@ void PORT1_IRQHandler( void )                                  // Interrupt hand
 }
 
 }
-
 #endif
 
