@@ -1,9 +1,20 @@
 #include "msp.h"
 #include <msp432p401r.h>
 #include <stdint.h>
+#include <stdio.h>
+#include "HAL_I2C.h"
+#include "HAL_OPT3001.h"
+#include <ti/devices/msp432p4xx/inc/msp.h>
+#include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+#include <ti/grlib/grlib.h>
+#include "HAL_I2C.h"
+#include "HAL_OPT3001.h"
 
 // LED1      @ P1.0
 // Button S1 @ P1.1
+
+
+void PORT1_IRQHandler();
 
 void main( void )
 {
@@ -30,8 +41,17 @@ void main( void )
     P2->DIR = BIT0;
     P2->OUT = BIT0 | BIT1 | BIT2;
 
+    //Setup for optical sensor
+    //OPT3001_init();
+    float lux;
+    bool state;
+
+
     for (;;)                                                   //Infinite Loop
     {
+        //lux = OPT3001_getLux();
+        //if (lux>300 && state==0){ PORT1_IRQHandler(); state=1; }
+        //else if (lux<200 && state==1){ PORT1_IRQHandler(); state=0; }
 
     }
 }

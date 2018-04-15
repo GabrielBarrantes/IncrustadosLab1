@@ -9,8 +9,11 @@
 #include "msp.h"
 #include <msp432p401r.h>
 
+#ifdef __cplusplus
 extern "C"
 {
+#endif
+
 void PORT1_IRQHandler( void )                                  // Interrupt handler for port 1
 {
     if(P1->IFG & BIT1)
@@ -23,5 +26,6 @@ void PORT1_IRQHandler( void )                                  // Interrupt hand
     }
 }
 
+#ifdef __cplusplus
 }
-
+#endif
