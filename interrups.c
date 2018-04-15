@@ -1,5 +1,5 @@
 /*
- * interrups.cpp
+ * interrups.c
  * contains the implementations of the interrutions
  *
  *  Created on: Apr 9, 2018
