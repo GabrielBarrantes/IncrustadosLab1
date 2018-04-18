@@ -13,9 +13,6 @@
 // LED1      @ P1.0
 // Button S1 @ P1.1
 
-
-void PORT1_IRQHandler();
-
 void main( void )
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;                // stop watchdog timer
