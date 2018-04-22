@@ -1,4 +1,4 @@
-# IncrustadosLab1
+# Sistemas Incrustados Laboratorio 1
 Laboratorio 1 Sistemas incrustados UCR
 
 Compiled usign TI v18.1.1.LTS
