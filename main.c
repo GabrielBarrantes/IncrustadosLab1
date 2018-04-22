@@ -62,8 +62,38 @@ void main( void )
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
     TIMER32_2->LOAD = 2* 0x0002DC6C0; //~1s ---> a 3Mhz
     TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
+    //TIMER32_2->
     NVIC_SetPriority(T32_INT2_IRQn,1);
     NVIC_EnableIRQ(T32_INT2_IRQn);
+    //
+    NVIC_SetPriority(TA0_0_IRQn,1);
+    NVIC_EnableIRQ(TA0_0_IRQn);
+    //
+    //TIMER_A0->R =  0x0000FFFF;
+    //uint16_t valores[5]; valores[0]=0xFFFF; valores[1]=0xFFFF;
+    TIMER_A0->R = 0x0;
+    //TIMER_A0->CTL =
+    TIMER_A0->CCR[0] =0xFFFF;
+
+    TA0CTL = TASSEL_2 | TAIE | MC_1;  // enable timerA0 interrupt, select MC up mode, Select SMCLK as timerclock
+
+    TA0CCTL0 = CCIE | CCIS_0 | OUTMOD_3;
+
+    TA0CCTL0 &= ~CAP;
+
+    TA0CCR1 = 0xFFFF;
+
+    TA0CCR0 = 0xFFFF;
+
+    TA0R = 0;
+
+    TA0IV = 0x02;
+
+
+
+    NVIC_SetPriority(TA0_0_IRQn,1);
+    NVIC_EnableIRQ(TA0_0_IRQn);
+
 
     ////
     //Setup for optical sensor

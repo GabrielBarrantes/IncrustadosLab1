@@ -38,6 +38,7 @@ void T32_INT1_IRQHandler(void)
     lux = OPT3001_getLux(); //read light sensor value
     ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // read adc
     state2 =1;
+    state3=1;
     ///////////////////////
     __enable_irq();
     return;
@@ -49,10 +50,25 @@ void T32_INT2_IRQHandler(void)
     TIMER32_2->INTCLR = 0U;
     ///////////////////////
     P2->OUT ^= BIT4;        //toggl indicator led
+    state3=0;
     ///////////////////////
     __enable_irq();
     return;
 }
+
+void TA0_0_IRQHandler(void)
+{
+    __disable_irq();
+    //TIMER32_2->INTCLR = 0U;
+    ///////////////////////
+    if(state3){ P2->OUT ^= BIT0;}        //toggl indicator led
+    //P2->OUT &= !BIT0;
+    ///////////////////////
+    __enable_irq();
+    return;
+}
+
+
 
 void ADC14_IRQHandler(void)
 {

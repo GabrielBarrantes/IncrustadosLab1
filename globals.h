@@ -11,8 +11,9 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-float lux;
-uint16_t soundIntensity;
+float lux;               //intensity of ambient light
+uint16_t soundIntensity; //intensity of ambient sound
 _Bool state2;
+_Bool state3;
 
 #endif /* GLOBALS_H_ */
