@@ -8,11 +8,14 @@
 
 #include "msp.h"
 #include <msp432p401r.h>
+#include "HAL_OPT3001.h"
+#include "globals.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
 
 void PORT1_IRQHandler( void )                                  // Interrupt handler for port 1
 {
@@ -24,6 +27,29 @@ void PORT1_IRQHandler( void )                                  // Interrupt hand
     P1->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
     P1->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
     }
+}
+
+void T32_INT1_IRQHandler(void)
+{
+    __disable_irq();
+    TIMER32_1->INTCLR = 0U;
+    ///////////////////////
+    P1->OUT ^= BIT0;        //toggl indicator led
+    lux = OPT3001_getLux(); //read light sensor value
+    ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // read adc
+    state2 =1;
+    ///////////////////////
+    __enable_irq();
+    return;
+}
+
+void ADC14_IRQHandler(void)
+{
+    __disable_irq();
+    soundIntensity = ADC14->MEM[0];
+    ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
+    __enable_irq();
+    return;
 }
 
 #ifdef __cplusplus
