@@ -43,6 +43,17 @@ void T32_INT1_IRQHandler(void)
     return;
 }
 
+void T32_INT2_IRQHandler(void)
+{
+    __disable_irq();
+    TIMER32_2->INTCLR = 0U;
+    ///////////////////////
+    P2->OUT ^= BIT4;        //toggl indicator led
+    ///////////////////////
+    __enable_irq();
+    return;
+}
+
 void ADC14_IRQHandler(void)
 {
     __disable_irq();

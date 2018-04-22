@@ -20,6 +20,10 @@ void main( void )
     P5->DIR |= BIT6;   //BlueLed on RGB led, BoosterPack
     P5->OUT |= BIT6;
 
+    P2->REN |= BIT4;
+    P2->DIR |= BIT4;   //GreenLed on RGB led, BoosterPack
+    P2->OUT |= BIT4;
+
     //P1->SEL0 = 0x00;                                         // Clear selection register 0 for port 1
     //P1->SEL1 = 0x00;                                         // Clear selection register 1 for port 1
 
@@ -54,6 +58,13 @@ void main( void )
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
+    // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
+    // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
+    TIMER32_2->LOAD = 2* 0x0002DC6C0; //~1s ---> a 3Mhz
+    TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
+    NVIC_SetPriority(T32_INT2_IRQn,1);
+    NVIC_EnableIRQ(T32_INT2_IRQn);
+
     ////
     //Setup for optical sensor
     Init_I2C_GPIO();
