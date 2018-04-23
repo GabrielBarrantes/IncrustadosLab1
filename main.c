@@ -14,7 +14,8 @@ void main( void )
 
     P2->REN |= BIT0;   //Red led on RGB led, launchpad
     P2->DIR |= BIT0;
-    P2->OUT &= BIT0;
+    //P2->OUT |= BIT0;
+    P2->OUT &= !BIT0;
 
     P5->REN |= BIT6;
     P5->DIR |= BIT6;   //BlueLed on RGB led, BoosterPack
@@ -89,41 +90,42 @@ void main( void )
 
     TA0IV = 0x02;
 
-
-
     NVIC_SetPriority(TA0_0_IRQn,1);
     NVIC_EnableIRQ(TA0_0_IRQn);
-
-
     ////
     //Setup for optical sensor
     Init_I2C_GPIO();
     I2C_init();
     OPT3001_init();
-    bool state = 1;
-
+    //bool state = 1;
     ////////////////////
     // Secuence start //
     ////////////////////
-    P2->OUT |= BIT0;   //on the light
-    __delay_cycles(3000000);
-    P2->OUT = 0x0;  //off the light
-    __delay_cycles(3000000);
-    P2->OUT |= BIT0;   //on the light
-    __delay_cycles(3000000);
-    P2->OUT &= !BIT0;   //off the light
-    __delay_cycles(3000000);
-    P2->OUT |= BIT0;   //on the light
-    __delay_cycles(3000000);
-    P2->OUT &= !BIT0;   //off the light
+    //start = 1;
+/*
+
+    P2->OUT ^= BIT0;
+    __delay_cycles(0x2DC6C0);
 
 
+    P2->OUT ^= BIT0;
+    __delay_cycles(0x2DC6C0);
+    P2->OUT ^= BIT0;
+    __delay_cycles(0xFFFFFFFF);
+    P2->OUT ^= BIT0;
+    __delay_cycles(0xFFFFFFFF);
 
+*/
+    //P2->OUT |= BIT0;
+    //__delay_cycles(600000);
 
-    __delay_cycles(600000);
+    _Bool state = 1;
+
+    P2->OUT |= BIT0;
 
     for (;;)                                                   //Infinite Loop
     {
+
         if (lux>600 && state){ P2->OUT ^= BIT0; state =0; }
         else if (lux<200 && !state){ P2->OUT ^= BIT0; state=1; }
 
@@ -133,6 +135,7 @@ void main( void )
             P5->OUT ^= BIT6;
             state2 = 0;
         }
+
     }
 }
 
