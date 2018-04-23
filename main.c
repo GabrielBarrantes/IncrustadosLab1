@@ -105,6 +105,20 @@ void main( void )
     ////////////////////
     // Secuence start //
     ////////////////////
+    P2->OUT |= BIT0;   //on the light
+    __delay_cycles(3000000);
+    P2->OUT = 0x0;  //off the light
+    __delay_cycles(3000000);
+    P2->OUT |= BIT0;   //on the light
+    __delay_cycles(3000000);
+    P2->OUT &= !BIT0;   //off the light
+    __delay_cycles(3000000);
+    P2->OUT |= BIT0;   //on the light
+    __delay_cycles(3000000);
+    P2->OUT &= !BIT0;   //off the light
+
+
+
 
     __delay_cycles(600000);
 

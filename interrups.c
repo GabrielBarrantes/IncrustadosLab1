@@ -61,7 +61,7 @@ void TA0_0_IRQHandler(void)
     __disable_irq();
     //TIMER32_2->INTCLR = 0U;
     ///////////////////////
-    if(state3){ P2->OUT ^= BIT0;}        //toggl indicator led
+    //if(state3){ P2->OUT ^= BIT0;}        //toggl indicator led
     //P2->OUT &= !BIT0;
     ///////////////////////
     __enable_irq();
