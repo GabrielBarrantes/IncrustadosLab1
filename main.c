@@ -102,6 +102,10 @@ void main( void )
     OPT3001_init();
     bool state = 1;
 
+    ////////////////////
+    // Secuence start //
+    ////////////////////
+
     __delay_cycles(600000);
 
     for (;;)                                                   //Infinite Loop
