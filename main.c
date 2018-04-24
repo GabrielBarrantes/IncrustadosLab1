@@ -82,7 +82,7 @@ void main( void )
 //////////////////////////////////////////////////////////////////////////
     // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
-    TIMER32_1->LOAD =  0x0002DC6C0; //~1s ---> a 3Mhz
+    TIMER32_1->LOAD = 10* 0x0002DC6C0; //~1s ---> a 3Mhz
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
@@ -157,8 +157,19 @@ void main( void )
 
     for (;;)                                                   //Infinite Loop
     {
-        if(!outState && onCondition){ onCondition=0; outState =1; turnOnLight(); }
-        else if(outState && offCondition){ offCondition=0; outState =0; turnOffLight(); }
+        if(onCondition)
+        {
+            TIMER32_1->LOAD = 0xA * 0x0002DC6C0;//Carga tiempo de espera minimo de luz encendida
+            onCondition=0;
+            outState =1;
+            turnOnLight();
+        }
+        else if(offCondition)
+        {
+            offCondition=0;
+            outState =0;
+            turnOffLight();
+        }
 
 /*
         //lux = OPT3001_getLux();
