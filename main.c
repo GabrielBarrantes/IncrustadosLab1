@@ -67,11 +67,9 @@ void main( void )
     NVIC_SetPriority(T32_INT2_IRQn,1);
     NVIC_EnableIRQ(T32_INT2_IRQn);
     //
-    NVIC_SetPriority(TA0_0_IRQn,1);
-    NVIC_EnableIRQ(TA0_0_IRQn);
-    //
     //TIMER_A0->R =  0x0000FFFF;
     //uint16_t valores[5]; valores[0]=0xFFFF; valores[1]=0xFFFF;
+/*
     TIMER_A0->R = 0x0;
     //TIMER_A0->CTL =
     TIMER_A0->CCR[0] =0xFFFF;
@@ -90,8 +88,10 @@ void main( void )
 
     TA0IV = 0x02;
 
-    NVIC_SetPriority(TA0_0_IRQn,1);
-    NVIC_EnableIRQ(TA0_0_IRQn);
+    NVIC_SetPriority(TA0_0_IRQn,2);
+    //NVIC_EnableIRQ(TA0_0_IRQn);
+*/
+
     ////
     //Setup for optical sensor
     Init_I2C_GPIO();
@@ -101,31 +101,37 @@ void main( void )
     ////////////////////
     // Secuence start //
     ////////////////////
-    //start = 1;
-/*
+    initialSeptUpParameters();
+    ///////////////////////////
+    P2->OUT |= BIT0;
+    __delay_cycles(3000000);
+    P2->OUT &= !BIT0;
+    __delay_cycles(3000000);
+    P2->OUT |= BIT0;
+    __delay_cycles(3000000);
+    P2->OUT &= !BIT0;
+    __delay_cycles(3000000);
+    P2->OUT |= BIT0;
+    __delay_cycles(3000000);
+    P2->OUT &= !BIT0;
+    __delay_cycles(3000000);
+    ///////////////////////////
+    //    Get initial lux    //
+    ///////////////////////////
+    lux = OPT3001_getLux();
+    if (lux < initialUmbral){ P2->OUT |= BIT0; outState = 1;}
+    else { P2->OUT &= !BIT0;; outState = 0; }
 
-    P2->OUT ^= BIT0;
-    __delay_cycles(0x2DC6C0);
-
-
-    P2->OUT ^= BIT0;
-    __delay_cycles(0x2DC6C0);
-    P2->OUT ^= BIT0;
-    __delay_cycles(0xFFFFFFFF);
-    P2->OUT ^= BIT0;
-    __delay_cycles(0xFFFFFFFF);
-
-*/
-    //P2->OUT |= BIT0;
     //__delay_cycles(600000);
 
     _Bool state = 1;
 
-    P2->OUT |= BIT0;
+
 
     for (;;)                                                   //Infinite Loop
     {
-
+/*
+        //lux = OPT3001_getLux();
         if (lux>600 && state){ P2->OUT ^= BIT0; state =0; }
         else if (lux<200 && !state){ P2->OUT ^= BIT0; state=1; }
 
@@ -135,7 +141,7 @@ void main( void )
             P5->OUT ^= BIT6;
             state2 = 0;
         }
-
+*/
     }
 }
 
