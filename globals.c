@@ -12,5 +12,7 @@
 void initialSeptUpParameters()
 {
     initialUmbral = __initialUmbral;
+    onCondition = 0;
+    offCondition = 0;
 }
 

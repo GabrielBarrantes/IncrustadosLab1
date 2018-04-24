@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include "globals.h"
 
+void turnOffLight() {  P2->OUT &= !BIT0; }
+
+void turnOnLight(){ P2->OUT |= BIT0; }
+
 void main( void )
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;                // stop watchdog timer
@@ -27,7 +31,7 @@ void main( void )
 
     //P1->SEL0 = 0x00;                                         // Clear selection register 0 for port 1
     //P1->SEL1 = 0x00;                                         // Clear selection register 1 for port 1
-
+    //////////////////Buton interrup
     P1->REN  = BIT1;                                           // Enable resistor for S1 (P1.1)
     P1->OUT  = BIT1;                                           // S1 (P1.1) high -> pull-up resistor, others low
     P1->DIR  = BIT0;                                           // LED1 (P1.0) to output direction, others input
@@ -38,7 +42,30 @@ void main( void )
     ///////////////////////////////
     NVIC_SetPriority(PORT1_IRQn,1);                            //Set interrup of boton priority
     NVIC_EnableIRQ(PORT1_IRQn);                                //Enable the buton interrup
-///////////////////////////////////////////////////////////////////////////
+    //////////////////Buton interrup
+    P3->REN  |= BIT5;                                           // Enable resistor for S1 (P1.1)
+    P3->OUT  |= BIT5;                                           // S1 (P1.1) high -> pull-up resistor, others low
+    P3->DIR  &= !BIT5;                                           // LED1 (P1.0) to output direction, others input
+    ///////////////////////////////
+    P3->IES  |= BIT5;                                           // Interrupt on high->low transition for S1 (P1.1)
+    P3->IFG  = 0x00;                                           // Clear any pending flags
+    P3->IE   |= BIT5;                                           // Enable interrupt for S1 (P1.1)
+    ///////////////////////////////
+    NVIC_SetPriority(PORT3_IRQn,1);                            //Set interrup of boton priority
+    NVIC_EnableIRQ(PORT3_IRQn);                                //Enable the buton interrup
+    //////////////////Buton interrup
+    P5->REN  |= BIT1;                                           // Enable resistor for S1 (P1.1)
+    P5->OUT  |= BIT1;                                           // S1 (P1.1) high -> pull-up resistor, others low
+    P5->DIR  &= !BIT1;                                           // LED1 (P1.0) to output direction, others input
+    ///////////////////////////////
+    P5->IES  |= BIT1;                                           // Interrupt on high->low transition for S1 (P1.1)
+    P5->IFG  = 0x00;                                           // Clear any pending flags
+    P5->IE   |= BIT1;                                           // Enable interrupt for S1 (P1.1)
+    ///////////////////////////////
+    NVIC_SetPriority(PORT5_IRQn,1);                            //Set interrup of boton priority
+    NVIC_EnableIRQ(PORT5_IRQn);                                //Enable the buton interrup
+
+    ///////////////////////////////////////////////////////////////////////////
     // Set P4.3 for Analog input, disabling the I/O circuit.
     P4->SEL0 = BIT3;
     P4->SEL1 = BIT3;
@@ -120,16 +147,19 @@ void main( void )
     ///////////////////////////
     lux = OPT3001_getLux();
     if (lux < initialUmbral){ P2->OUT |= BIT0; outState = 1;}
-    else { P2->OUT &= !BIT0;; outState = 0; }
+    else { P2->OUT &= !BIT0; outState = 0; }
 
     //__delay_cycles(600000);
 
-    _Bool state = 1;
+    //_Bool state = 1;
 
 
 
     for (;;)                                                   //Infinite Loop
     {
+        if(!outState && onCondition){ onCondition=0; outState =1; turnOnLight(); }
+        else if(outState && offCondition){ offCondition=0; outState =0; turnOffLight(); }
+
 /*
         //lux = OPT3001_getLux();
         if (lux>600 && state){ P2->OUT ^= BIT0; state =0; }
@@ -144,7 +174,6 @@ void main( void )
 */
     }
 }
-
 
 /*
 

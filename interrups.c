@@ -22,10 +22,40 @@ void PORT1_IRQHandler( void )                                  // Interrupt hand
     if(P1->IFG & BIT1)
     {
     P1->IE &= ~BIT1;                                           // Disable interrupt for S1 (P1.1) for debouncing
-    P1->OUT ^= BIT0;                                           // Toggle LED1 (P1.0)
+    //P1->OUT ^= BIT0;                                           // Toggle LED1 (P1.0)
+    if(!outState){ onCondition=1; }
+    else { offCondition=1; }
     __delay_cycles(600000);                                    // Delay of 200ms
     P1->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
     P1->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
+    }
+}
+
+void PORT3_IRQHandler( void )                                  // Interrupt handler for port 1
+{
+    if(P3->IFG & BIT5)
+    {
+    P3->IE &= ~BIT5;                                           // Disable interrupt for S1 (P1.1) for debouncing
+    //P2->OUT ^= BIT0;                                           // Toggle LED1 (P1.0)
+    if(!outState){ onCondition=1; }
+    else { offCondition=1; }
+    __delay_cycles(600000);                                    // Delay of 200ms
+    P3->IFG &= ~BIT5;                                          // Clear pending interrupt flag for S1 (P1.1)
+    P3->IE |= BIT5;                                            // Enable interrupt for S1 (P1.1)
+    }
+}
+
+void PORT5_IRQHandler( void )                                  // Interrupt handler for port 1
+{
+    if(P5->IFG & BIT1)
+    {
+    P5->IE &= ~BIT1;                                           // Disable interrupt for S1 (P1.1) for debouncing
+    //P2->OUT ^= BIT0;                                           // Toggle LED1 (P1.0)
+    if(!outState){ onCondition=1; }
+    else { offCondition=1; }
+    __delay_cycles(600000);                                    // Delay of 200ms
+    P5->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
+    P5->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
     }
 }
 
