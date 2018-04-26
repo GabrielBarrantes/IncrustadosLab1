@@ -82,8 +82,18 @@ void T32_INT2_IRQHandler(void)
     __disable_irq();
     TIMER32_2->INTCLR = 0U;
     ///////////////////////
-    P2->OUT ^= BIT4;        //toggl indicator led
-    state3=0;
+    //P2->OUT ^= BIT4;        //toggl indicator led
+    //state3=0;
+
+
+
+    ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // esta linea lee el valor del adc y lo deja en la global soundIntensity
+
+
+
+
+
+
     ///////////////////////
     __enable_irq();
     return;

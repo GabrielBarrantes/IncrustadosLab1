@@ -19,6 +19,7 @@
 #define __dayIntensityUmbral 900
 #define __darkIntensityUmbral 300
 #define __waitTimeforToggl 10
+#define __SAMPLE_LENGTH 512
 
 
 /*
@@ -35,6 +36,10 @@ _Bool offCondition;
 _Bool state2;
 _Bool state3;
 int initialUmbral;
+_Bool sampleArray;
+int32_t meanSound;
+int16_t data_array1[__SAMPLE_LENGTH];
+int16_t data_array2[__SAMPLE_LENGTH];
 
 /*
  * Startup function
