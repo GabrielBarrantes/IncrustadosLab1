@@ -146,7 +146,12 @@ void main( void )
     //    Get initial lux    //
     ///////////////////////////
     lux = OPT3001_getLux();
-    if (lux < initialUmbral){ P2->OUT |= BIT0; outState = 1;}
+    if (lux < initialUmbral)
+    {
+        P2->OUT |= BIT0;
+        outState = 1;
+        TIMER32_1->LOAD = 0xA * 0x0002DC6C0;
+    }
     else { P2->OUT &= !BIT0; outState = 0; }
 
     //__delay_cycles(600000);
