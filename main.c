@@ -200,12 +200,13 @@ void main( void )
             turnOffLight();
         }
 
+/*
         data_array[counter]= soundIntensity;
 
-        lastMeanSound=lastMeanSound+(data_array[counter]-data_array[(counter-32)%__SAMPLE_LENGTH])/32;
-        meanSound = meanSound+(-data_array[counter+1]+data_array[(counter-32-1)%__SAMPLE_LENGTH])/__SAMPLE_LENGTH ;
+        lastMeanSound=lastMeanSound+(data_array[counter]-data_array[(counter-32+1)%__SAMPLE_LENGTH])/32;
+        meanSound = meanSound+(-data_array[(counter+1)%__SAMPLE_LENGTH]+data_array[(counter-32)%__SAMPLE_LENGTH])/__SAMPLE_LENGTH ;
         if(lastMeanSound>1.1*meanSound){ onCondition=1; }
-
+*/
 
 
 /*

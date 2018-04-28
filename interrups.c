@@ -247,13 +247,29 @@ void ADC14_IRQHandler(void)
 {
     __disable_irq();
     soundIntensity = ADC14->MEM[0];
-/*
+
     data_array[counter]= soundIntensity;
 
-    lastMeanSound=lastMeanSound+(data_array[counter]-data_array[(counter-32)%__SAMPLE_LENGTH])/32;
-    meanSound = meanSound+(-data_array[counter+1]+data_array[(counter-32-1)%__SAMPLE_LENGTH])/__SAMPLE_LENGTH ;
+
+
+    int j=counter-32+1;
+    if(counter-32+1<0){ j = __SAMPLE_LENGTH + counter-32+1 ;}
+
+
+
+    lastMeanSound=lastMeanSound+(data_array[counter]-data_array[j])/32;
+
+    int k = counter-32; int l = counter+1;
+    if(counter==__SAMPLE_LENGTH){ counter=0; }
+    if(counter-32<0){ k = __SAMPLE_LENGTH + counter-32 ;}
+
+    meanSound = meanSound+(-data_array[l]+data_array[k])/__SAMPLE_LENGTH ;
+
     if(lastMeanSound>1.1*meanSound){ onCondition=1; }
-*/
+
+
+    counter++;
+    if(counter==__SAMPLE_LENGTH){counter = 0;}
 
 
     ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
