@@ -8,18 +8,31 @@
 #include <stdio.h>
 #include "globals.h"
 
-void turnOffLight() {  P2->OUT &= !BIT0; }
+#define multi 16
+
+void turnOffLight() {  P2->OUT &= ~BIT0; }
 
 void turnOnLight(){ P2->OUT |= BIT0; }
+
+void CalculateMean()
+{
+    //int i
+    //for()
+    //{
+
+    //}
+}
+
+
+
 
 void main( void )
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;                // stop watchdog timer
 
     P2->REN |= BIT0;   //Red led on RGB led, launchpad
-    P2->DIR |= BIT0;
-    //P2->OUT |= BIT0;
-    P2->OUT &= !BIT0;
+    P2->DIR |= BIT0;//P2->OUT |= BIT0;
+    P2->OUT &= ~BIT0;
 
     P5->REN |= BIT6;
     P5->DIR |= BIT6;   //BlueLed on RGB led, BoosterPack
@@ -45,7 +58,7 @@ void main( void )
     //////////////////Buton interrup
     P3->REN  |= BIT5;                                           // Enable resistor for S1 (P1.1)
     P3->OUT  |= BIT5;                                           // S1 (P1.1) high -> pull-up resistor, others low
-    P3->DIR  &= !BIT5;                                           // LED1 (P1.0) to output direction, others input
+    P3->DIR  &= ~BIT5;                                           // LED1 (P1.0) to output direction, others input
     ///////////////////////////////
     P3->IES  |= BIT5;                                           // Interrupt on high->low transition for S1 (P1.1)
     P3->IFG  = 0x00;                                           // Clear any pending flags
@@ -56,7 +69,7 @@ void main( void )
     //////////////////Buton interrup
     P5->REN  |= BIT1;                                           // Enable resistor for S1 (P1.1)
     P5->OUT  |= BIT1;                                           // S1 (P1.1) high -> pull-up resistor, others low
-    P5->DIR  &= !BIT1;                                           // LED1 (P1.0) to output direction, others input
+    P5->DIR  &= ~BIT1;                                           // LED1 (P1.0) to output direction, others input
     ///////////////////////////////
     P5->IES  |= BIT1;                                           // Interrupt on high->low transition for S1 (P1.1)
     P5->IFG  = 0x00;                                           // Clear any pending flags
@@ -82,15 +95,17 @@ void main( void )
 //////////////////////////////////////////////////////////////////////////
     // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
-    TIMER32_1->LOAD = 10* 0x0002DC6C0; //~1s ---> a 3Mhz
+    TIMER32_1->LOAD = multi * 10* 0x0002DC6C0; //~1s ---> a 3Mhz
+    //TIMER32_1->LOAD = 10* 0x02DC6C00; //~1s ---> a 48Mhz
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
     // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
-    TIMER32_2->LOAD = 2* 0x0002DC6C0; //~1s ---> a 3Mhz
+    //TIMER32_2->LOAD = multi* 2* 0x0002DC6C0; //~1s ---> a 3Mhz
+    //TIMER32_2->LOAD = 2* 0x02DC6C00; //~1s ---> a 48Mhz
+    TIMER32_2->LOAD =  48000; //~Sampling 1kHz ---> a 48Mhz
     TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
-    //TIMER32_2->
     NVIC_SetPriority(T32_INT2_IRQn,1);
     NVIC_EnableIRQ(T32_INT2_IRQn);
     //
@@ -131,17 +146,23 @@ void main( void )
     initialSeptUpParameters();
     ///////////////////////////
     P2->OUT |= BIT0;
-    __delay_cycles(3000000);
-    P2->OUT &= !BIT0;
-    __delay_cycles(3000000);
+    __delay_cycles(multi * 3000000);
+    //__delay_cycles(48000000);
+    P2->OUT &= ~BIT0;
+    __delay_cycles(multi * 3000000);
+    //__delay_cycles(48000000);
     P2->OUT |= BIT0;
-    __delay_cycles(3000000);
-    P2->OUT &= !BIT0;
-    __delay_cycles(3000000);
+    __delay_cycles(multi * 3000000);
+    //__delay_cycles(48000000);
+    P2->OUT &= ~BIT0;
+    __delay_cycles(multi * 3000000);
+    //__delay_cycles(48000000);
     P2->OUT |= BIT0;
-    __delay_cycles(3000000);
-    P2->OUT &= !BIT0;
-    __delay_cycles(3000000);
+    __delay_cycles(multi * 3000000);
+    //__delay_cycles(48000000);
+    P2->OUT &= ~BIT0;
+    __delay_cycles(multi * 3000000);
+    //__delay_cycles(48000000);
     ///////////////////////////
     //    Get initial lux    //
     ///////////////////////////
@@ -150,9 +171,11 @@ void main( void )
     {
         P2->OUT |= BIT0;
         outState = 1;
-        TIMER32_1->LOAD = 0xA * 0x0002DC6C0;
+        TIMER32_1->LOAD = multi * 0xA * 0x0002DC6C0;
+        //TIMER32_1->LOAD = 0xA * 0x02DC6C00;//48Mhz
+
     }
-    else { P2->OUT &= !BIT0; outState = 0; }
+    else { P2->OUT &= ~BIT0; outState = 0; }
 
     //__delay_cycles(600000);
 
@@ -164,7 +187,8 @@ void main( void )
     {
         if(onCondition)
         {
-            TIMER32_1->LOAD = 0xA * 0x0002DC6C0;//Carga tiempo de espera minimo de luz encendida
+            TIMER32_1->LOAD = multi * 0xA * 0x002DC6C0;//Carga tiempo de espera minimo de luz encendida
+            //TIMER32_1->LOAD = 0xA * 0x02DC6C00;//48Mhz
             onCondition=0;
             outState =1;
             turnOnLight();
@@ -175,6 +199,14 @@ void main( void )
             outState =0;
             turnOffLight();
         }
+
+        data_array[counter]= soundIntensity;
+
+        lastMeanSound=lastMeanSound+(data_array[counter]-data_array[(counter-32)%__SAMPLE_LENGTH])/32;
+        meanSound = meanSound+(-data_array[counter+1]+data_array[(counter-32-1)%__SAMPLE_LENGTH])/__SAMPLE_LENGTH ;
+        if(lastMeanSound>1.1*meanSound){ onCondition=1; }
+
+
 
 /*
         //lux = OPT3001_getLux();
