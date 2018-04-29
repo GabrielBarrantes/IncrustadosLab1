@@ -3,28 +3,13 @@
 #include <ti/grlib/grlib.h>
 #include "HAL_I2C.h"
 #include "HAL_OPT3001.h"
-//#include "LcdDriver/Crystalfontz128x128_ST7735.h"
-//#include "LcdDriver/HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h"
 #include <stdio.h>
 #include "globals.h"
 
-#define multi 16
 
-void turnOffLight() {  P2->OUT &= ~BIT0; }
+void TurnOffLight() {  P2->OUT &= ~BIT0; }
 
-void turnOnLight(){ P2->OUT |= BIT0; }
-
-void CalculateMean()
-{
-    //int i
-    //for()
-    //{
-
-    //}
-}
-
-
-
+void TurnOnLight(){ P2->OUT |= BIT0; }
 
 void main( void )
 {
@@ -41,6 +26,7 @@ void main( void )
     P2->REN |= BIT4;
     P2->DIR |= BIT4;   //GreenLed on RGB led, BoosterPack
     P2->OUT |= BIT4;
+    P2->OUT &= ~BIT4;
 
     //P1->SEL0 = 0x00;                                         // Clear selection register 0 for port 1
     //P1->SEL1 = 0x00;                                         // Clear selection register 1 for port 1
@@ -95,7 +81,7 @@ void main( void )
 //////////////////////////////////////////////////////////////////////////
     // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
-    TIMER32_1->LOAD = multi * 10* 0x0002DC6C0; //~1s ---> a 3Mhz
+    TIMER32_1->LOAD = multi * multiplicadorTiempoOn * 0x0002DC6C0; //~1s ---> a 3Mhz
     //TIMER32_1->LOAD = 10* 0x02DC6C00; //~1s ---> a 48Mhz
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
@@ -104,7 +90,7 @@ void main( void )
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
     //TIMER32_2->LOAD = multi* 2* 0x0002DC6C0; //~1s ---> a 3Mhz
     //TIMER32_2->LOAD = 2* 0x02DC6C00; //~1s ---> a 48Mhz
-    TIMER32_2->LOAD =  48000; //~Sampling 1kHz ---> a 48Mhz
+    TIMER32_2->LOAD =  6000; //48000; //~Sampling 1kHz ---> a 48Mhz
     TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT2_IRQn,1);
     NVIC_EnableIRQ(T32_INT2_IRQn);
@@ -139,181 +125,58 @@ void main( void )
     Init_I2C_GPIO();
     I2C_init();
     OPT3001_init();
-    //bool state = 1;
     ////////////////////
     // Secuence start //
     ////////////////////
-    initialSeptUpParameters();
+    InitialSeptUpParameters();
     ///////////////////////////
     P2->OUT |= BIT0;
-    __delay_cycles(multi * 3000000);
+    __delay_cycles(multi * 1500000);
     //__delay_cycles(48000000);
     P2->OUT &= ~BIT0;
-    __delay_cycles(multi * 3000000);
+    __delay_cycles(multi * 1500000);
     //__delay_cycles(48000000);
     P2->OUT |= BIT0;
-    __delay_cycles(multi * 3000000);
+    __delay_cycles(multi * 1500000);
     //__delay_cycles(48000000);
     P2->OUT &= ~BIT0;
-    __delay_cycles(multi * 3000000);
+    __delay_cycles(multi * 1500000);
     //__delay_cycles(48000000);
     P2->OUT |= BIT0;
-    __delay_cycles(multi * 3000000);
+    __delay_cycles(multi * 1500000);
     //__delay_cycles(48000000);
     P2->OUT &= ~BIT0;
-    __delay_cycles(multi * 3000000);
+    __delay_cycles(multi * 1500000);
     //__delay_cycles(48000000);
     ///////////////////////////
     //    Get initial lux    //
     ///////////////////////////
-    lux = OPT3001_getLux();
-    if (lux < initialUmbral)
+    //lux = OPT3001_getLux();
+    if (OPT3001_getLux() < g_iInitialUmbral)
     {
-        P2->OUT |= BIT0;
-        outState = 1;
-        TIMER32_1->LOAD = multi * 0xA * 0x0002DC6C0;
-        //TIMER32_1->LOAD = 0xA * 0x02DC6C00;//48Mhz
+        TIMER32_1->LOAD = multi * multiplicadorTiempoOn * 0x002DC6C0;
+        TurnOnLight();
+        g_bOutState = 1;
+        g_bOffCondition = 0;
 
     }
-    else { P2->OUT &= ~BIT0; outState = 0; }
-
-    //__delay_cycles(600000);
-
-    //_Bool state = 1;
-
-
+    else { TurnOffLight(); g_bOutState = 0; }
 
     for (;;)                                                   //Infinite Loop
     {
-        if(onCondition)
+        if(g_bOnCondition)
         {
-            TIMER32_1->LOAD = multi * 0xA * 0x002DC6C0;//Carga tiempo de espera minimo de luz encendida
+            TIMER32_1->LOAD = multi * multiplicadorTiempoOn * 0x002DC6C0;//Carga tiempo de espera minimo de luz encendida
             //TIMER32_1->LOAD = 0xA * 0x02DC6C00;//48Mhz
-            onCondition=0;
-            outState =1;
-            turnOnLight();
+            g_bOnCondition=0;
+            g_bOutState =1;
+            TurnOnLight();
         }
-        else if(offCondition)
+        else if(g_bOffCondition)
         {
-            offCondition=0;
-            outState =0;
-            turnOffLight();
+            g_bOffCondition=0;
+            g_bOutState =0;
+            TurnOffLight();
         }
-
-/*
-        data_array[counter]= soundIntensity;
-
-        lastMeanSound=lastMeanSound+(data_array[counter]-data_array[(counter-32+1)%__SAMPLE_LENGTH])/32;
-        meanSound = meanSound+(-data_array[(counter+1)%__SAMPLE_LENGTH]+data_array[(counter-32)%__SAMPLE_LENGTH])/__SAMPLE_LENGTH ;
-        if(lastMeanSound>1.1*meanSound){ onCondition=1; }
-*/
-
-
-/*
-        //lux = OPT3001_getLux();
-        if (lux>600 && state){ P2->OUT ^= BIT0; state =0; }
-        else if (lux<200 && !state){ P2->OUT ^= BIT0; state=1; }
-
-        if( soundIntensity>10000U && state2 )
-        {
-            //P2->OUT ^= BIT0;
-            P5->OUT ^= BIT6;
-            state2 = 0;
-        }
-*/
     }
 }
-
-/*
-
-#include "msp.h"
-
-uint16_t ADC14Result = 0U;
-_Bool state = 1;
-int main(void)
-{
-    //uint32_t csregister = 0x0;
-
-    WDTCTL = WDTPW | WDTHOLD;                    // Stop watchdog timer //
-
-    P1->REN |= BIT0;
-    P1->DIR |= BIT0;
-    P1->OUT |= BIT0;
-
-    //
-    //
-    P2->REN |= BIT0;   //Red led, placa abajo
-    P2->DIR |= BIT0;
-    P2->OUT &= !BIT0;
-
-    P5->REN |= BIT6;
-    P5->DIR |= BIT6; //BlueLed
-    P5->OUT |= BIT6;
-    //P2->REN |= BIT4;
-    //P2->DIR |= BIT4; //GreenLed
-    //P2->OUT |= BIT4;
-    //P2->REN |= BIT6;
-    //P2->DIR |= BIT6; //RedLed *** no funciona ***
-    //P2->OUT |= BIT6;
-
-
-    //
-    //
-
-    // Set P4.3 for Analog input, disabling the I/O circuit.
-    P4->SEL0 = BIT3;
-    P4->SEL1 = BIT3;
-    P4->DIR &= ~BIT3;
-
-    //TIMER32_1->LOAD = 0x00B71B00; //~0.5s ---> a 48Mhz
-    TIMER32_1->LOAD =  0x0002DC6C0; //~1s ---> a 3Mhz
-    TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
-    NVIC_SetPriority(T32_INT1_IRQn,1);
-    NVIC_EnableIRQ(T32_INT1_IRQn);
-
-    ADC14->CTL0 = ADC14_CTL0_PDIV_0 | ADC14_CTL0_SHS_0 | ADC14_CTL0_DIV_7 |
-                  ADC14_CTL0_SSEL__MCLK | ADC14_CTL0_SHT0_1 | ADC14_CTL0_ON
-                  | ADC14_CTL0_SHP;
-    ADC14->MCTL[0] = ADC14_MCTLN_INCH_10 | ADC14_MCTLN_VRSEL_0;
-    ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_ENC;
-    ADC14->IER0 = ADC14_IER0_IE0;
-    NVIC_SetPriority(ADC14_IRQn,1);
-    NVIC_EnableIRQ(ADC14_IRQn);
-    while (1)
-    {
-        //16383
-        if( ADC14Result>10000 && state )
-        {
-            P2->OUT ^= BIT0;
-            P5->OUT ^= BIT6;
-            state = 0;
-        }
-    }
-
-    return 0;
-}
-
-void T32_INT1_IRQHandler(void)
-{
-    __disable_irq();
-
-    state =1;
-
-
-    TIMER32_1->INTCLR = 0U;
-    P1->OUT ^= BIT0;
-    ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // Start
-    __enable_irq();
-    return;
-}
-
-void ADC14_IRQHandler(void)
-{
-    __disable_irq();
-    ADC14Result = ADC14->MEM[0];
-    ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
-    __enable_irq();
-    return;
-}
-
-*/

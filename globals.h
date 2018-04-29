@@ -15,11 +15,14 @@
  * Preprocesator parameters
  */
 
-#define __initialUmbral      600
-#define __dayIntensityUmbral 900
+#define __initialUmbral       600
+#define __dayIntensityUmbral  900
 #define __darkIntensityUmbral 300
-#define __waitTimeforToggl 10
-#define __SAMPLE_LENGTH 5000
+#define __waitTimeforToggl    10
+#define __SAMPLE_LENGTH       16000
+#define __Last_Length         64
+#define multi                 16
+#define multiplicadorTiempoOn 2
 
 
 /*
@@ -27,29 +30,29 @@
  *
  */
 
-_Bool startState;
-float lux;               //intensity of ambient light
-uint16_t soundIntensity; //intensity of ambient sound
-_Bool outState;
-_Bool onCondition;
-_Bool offCondition;
-_Bool state2;
-_Bool state3;
-int initialUmbral;
-_Bool sampleArray;
-int counter;
-float lastMeanSound;
-float meanSound;
-float data_array[__SAMPLE_LENGTH];
-int16_t data_array1[__SAMPLE_LENGTH];
-int16_t data_array2[__SAMPLE_LENGTH];
+//_Bool startState;
+//float g_fLux;            //intensity of ambient light
+//uint16_t soundIntensity; //intensity of ambient sound
+_Bool g_bOutState;
+_Bool g_bOnCondition;
+_Bool g_bOffCondition;
+//_Bool state2;
+//_Bool state3;
+int g_iInitialUmbral;
+//_Bool sampleArray;
+int g_iCounter;
+float g_fLastMeanSound;
+float g_fMeanSound;
+float g_fdataArray[__SAMPLE_LENGTH];
+//int16_t data_array1[__SAMPLE_LENGTH];
+//int16_t data_array2[__SAMPLE_LENGTH];
 
 /*
  * Startup function
  *
  */
 
-void initialSeptUpParameters();
+void InitialSeptUpParameters();
 
 
 #endif /* GLOBALS_H_ */
