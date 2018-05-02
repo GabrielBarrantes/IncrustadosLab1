@@ -43,8 +43,21 @@ void PORT5_IRQHandler( void )                                  // Interrupt hand
     {
     P5->IE &= ~BIT1;                                           // Disable interrupt for S1 (P1.1) for debouncing
     //P2->OUT ^= BIT0;                                         // Toggle LED1 (P1.0)
-    if(!g_bOutState){ g_bOnCondition=1; }
-    else { g_bOffCondition=1; }
+    //if(!g_bOutState){ g_bOnCondition=1; }
+    //else { g_bOffCondition=1; }
+    if(g_bOutState)
+    {
+        g_iNumberOfLights++;
+        if(g_iNumberOfLights>3)
+        {
+            TurnOffLight();
+            g_iNumberOfLights=1;
+            TurnOnLight();
+        }
+        TurnOnLight();
+    }
+
+
     __delay_cycles(__frecuencyMultiplier*600000);                                    // Delay of 200ms
     P5->IFG &= ~BIT1;                                          // Clear pending interrupt flag for S1 (P1.1)
     P5->IE |= BIT1;                                            // Enable interrupt for S1 (P1.1)
@@ -56,7 +69,7 @@ void T32_INT1_IRQHandler(void)
     __disable_irq();
     TIMER32_1->INTCLR = 0U;
     ///////////////////////
-    P1->OUT ^= BIT0;        //toggl indicator led
+    //P1->OUT ^= BIT0;        //toggl indicator led
     //if( start ){ P2->OUT ^= BIT0; }
     //lux = OPT3001_getLux(); //read light sensor value
     //P2->OUT ^= BIT0;
@@ -75,7 +88,6 @@ void T32_INT2_IRQHandler(void)
     TIMER32_2->INTCLR = 0U;
     ///////////////////////
     //P2->OUT ^= BIT4;        //toggl indicator led
-    //state3=0;
     ADC14->CTL0 = ADC14->CTL0 | ADC14_CTL0_SC; // esta linea lee el valor del adc y recalcula los promedios
     ///////////////////////
     __enable_irq();
@@ -127,6 +139,33 @@ void ADC14_IRQHandler(void)
     __enable_irq();
     return;
 }
+
+void TA0_N_IRQHandler(void)
+{
+    __disable_irq();
+    ///////////////////////
+
+
+
+    ///////////////////////
+    TA0CTL &= ~ BIT0;
+    __enable_irq();
+    return;
+}
+
+void TA1_N_IRQHandler(void)
+{
+    __disable_irq();
+    ///////////////////////
+
+
+    ///////////////////////
+    TA0CTL &= ~ BIT0;
+    __enable_irq();
+    return;
+}
+
+
 
 #ifdef __cplusplus
 }

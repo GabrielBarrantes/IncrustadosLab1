@@ -7,9 +7,7 @@
 #include "globals.h"
 
 
-void TurnOffLight() {  P2->OUT &= ~BIT0; }
 
-void TurnOnLight(){ P2->OUT |= BIT0; }
 
 void main( void )
 {
@@ -21,7 +19,8 @@ void main( void )
 
     P5->REN |= BIT6;
     P5->DIR |= BIT6;   //BlueLed on RGB led, BoosterPack
-    P5->OUT |= BIT6;
+    //P5->OUT |= BIT6;
+    P5->OUT &= ~BIT6;
 
     P2->REN |= BIT4;
     P2->DIR |= BIT4;   //GreenLed on RGB led, BoosterPack
@@ -73,7 +72,6 @@ void main( void )
     //////////////////////////
     // Setup for adc        //
     //////////////////////////
-
     ADC14->CTL0 = ADC14_CTL0_PDIV_0 | ADC14_CTL0_SHS_0 | ADC14_CTL0_DIV_7 |
                   ADC14_CTL0_SSEL__MCLK | ADC14_CTL0_SHT0_1 | ADC14_CTL0_ON
                   | ADC14_CTL0_SHP;
@@ -94,6 +92,17 @@ void main( void )
     TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT2_IRQn,1);
     NVIC_EnableIRQ(T32_INT2_IRQn);
+/*
+    TA0CTL = TASSEL_2 | TAIE | MC_1;  // enable timerA0 interrupt, select MC up mode, Select SMCLK as timerclock
+    TA0CCR0 = 0x0006; //use MC_1 for a count to this value
+    NVIC_SetPriority(TA0_N_IRQn,1);
+    NVIC_EnableIRQ(TA0_N_IRQn);
+
+    TA1CTL = TASSEL_2 | TAIE | MC_2;  // enable timerA0 interrupt, select MC up mode, Select SMCLK as timerclock
+    //TA1CCR0 = 0x0006; //use MC_1 for a count to this value
+    NVIC_SetPriority(TA1_N_IRQn,1);
+    NVIC_EnableIRQ(TA1_N_IRQn);
+*/
     ////////////////////////////
     //Setup for optical sensor//
     ////////////////////////////
@@ -105,28 +114,21 @@ void main( void )
     ////////////////////
     InitialSeptUpParameters();
     ///////////////////////////
-    P2->OUT |= BIT0;
+    TurnOnLight();//P2->OUT |= BIT0;
     __delay_cycles(__frecuencyMultiplier * 1500000);
-    //__delay_cycles(48000000);
-    P2->OUT &= ~BIT0;
+    TurnOffLight();//P2->OUT &= ~BIT0;
     __delay_cycles(__frecuencyMultiplier * 1500000);
-    //__delay_cycles(48000000);
-    P2->OUT |= BIT0;
+    TurnOnLight();//P2->OUT |= BIT0;
     __delay_cycles(__frecuencyMultiplier * 1500000);
-    //__delay_cycles(48000000);
-    P2->OUT &= ~BIT0;
+    TurnOffLight();//P2->OUT &= ~BIT0;
     __delay_cycles(__frecuencyMultiplier * 1500000);
-    //__delay_cycles(48000000);
-    P2->OUT |= BIT0;
+    TurnOnLight();//P2->OUT |= BIT0;
     __delay_cycles(__frecuencyMultiplier * 1500000);
-    //__delay_cycles(48000000);
-    P2->OUT &= ~BIT0;
+    TurnOffLight();//P2->OUT &= ~BIT0;
     __delay_cycles(__frecuencyMultiplier * 1500000);
-    //__delay_cycles(48000000);
     ///////////////////////////
     //    Get initial lux    //
     ///////////////////////////
-    //lux = OPT3001_getLux();
     if (OPT3001_getLux() < g_iInitialUmbral)
     {
         TIMER32_1->LOAD = __frecuencyMultiplier * __Multiplier_On_Time * 0x002DC6C0;
@@ -150,6 +152,7 @@ void main( void )
         {
             g_bOffCondition=0;
             g_bOutState =0;
+            g_iNumberOfLights=1;
             TurnOffLight();
         }
     }

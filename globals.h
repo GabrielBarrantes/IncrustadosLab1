@@ -19,12 +19,12 @@
 #define __dayIntensityUmbral  900
 #define __darkIntensityUmbral 300
 #define __waitTimeforToggl    10
-#define __SAMPLE_LENGTH       16000
-#define __Last_Length         64
-//#define multi                 16
+#define __SAMPLE_LENGTH       16000 //guardamos muestras de los ultimos dos segundos
+#define __Last_Length         4000 //64 funciona bien, 4000 toma el promedio final de medio segundo
 #define __frecuencyMultiplier 16
 
-#define __Multiplier_On_Time  2
+#define __Multiplier_On_Time  4
+#define __Number_Of_Lights    1
 
 
 /*
@@ -32,29 +32,24 @@
  *
  */
 
-//_Bool startState;
-//float g_fLux;            //intensity of ambient light
-//uint16_t soundIntensity; //intensity of ambient sound
 _Bool g_bOutState;
 _Bool g_bOnCondition;
 _Bool g_bOffCondition;
-//_Bool state2;
-//_Bool state3;
-int g_iInitialUmbral;
-//_Bool sampleArray;
-int g_iCounter;
+int   g_iInitialUmbral;
+int   g_iCounter;
 float g_fLastMeanSound;
 float g_fMeanSound;
 float g_fdataArray[__SAMPLE_LENGTH];
-//int16_t data_array1[__SAMPLE_LENGTH];
-//int16_t data_array2[__SAMPLE_LENGTH];
+int   g_iNumberOfLights;
 
 /*
- * Startup function
+ * general functions
  *
  */
 
 void InitialSeptUpParameters();
+void TurnOnLight();
+void TurnOffLight();
 
 
 #endif /* GLOBALS_H_ */

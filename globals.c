@@ -14,11 +14,23 @@ void InitialSeptUpParameters()
     g_iInitialUmbral = __initialUmbral;
     g_bOnCondition = 0;
     g_bOffCondition = 0;
-    //sampleArray =0;
     g_iCounter = 0;
     g_fMeanSound = 0;
     g_fLastMeanSound=0;
-    //int i;
-    //for( i=0 ; i < __SAMPLE_LENGTH; i++){ data_array[i]=0; }
+    g_iNumberOfLights=__Number_Of_Lights;
 }
 
+void TurnOffLight()
+{
+    P1->OUT &= ~BIT0;
+    P2->OUT &= ~BIT0;
+    P5->OUT &= ~BIT6;
+}
+
+void TurnOnLight()
+{
+    P1->OUT |= BIT0;
+    if (g_iNumberOfLights>=2){ P2->OUT |= BIT0; }
+    if (g_iNumberOfLights==3){ P5->OUT |= BIT6; }
+
+}
