@@ -21,8 +21,10 @@
 #define __waitTimeforToggl    10
 #define __SAMPLE_LENGTH       16000
 #define __Last_Length         64
-#define multi                 16
-#define multiplicadorTiempoOn 2
+//#define multi                 16
+#define __frecuencyMultiplier 16
+
+#define __Multiplier_On_Time  2
 
 
 /*

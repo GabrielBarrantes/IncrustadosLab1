@@ -70,6 +70,10 @@ void main( void )
     P4->SEL1 = BIT3;
     P4->DIR &= ~BIT3;
 
+    //////////////////////////
+    // Setup for adc        //
+    //////////////////////////
+
     ADC14->CTL0 = ADC14_CTL0_PDIV_0 | ADC14_CTL0_SHS_0 | ADC14_CTL0_DIV_7 |
                   ADC14_CTL0_SSEL__MCLK | ADC14_CTL0_SHT0_1 | ADC14_CTL0_ON
                   | ADC14_CTL0_SHP;
@@ -78,50 +82,21 @@ void main( void )
     ADC14->IER0 = ADC14_IER0_IE0;
     NVIC_SetPriority(ADC14_IRQn,1);
     NVIC_EnableIRQ(ADC14_IRQn);
-//////////////////////////////////////////////////////////////////////////
-    // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
-    // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
-    TIMER32_1->LOAD = multi * multiplicadorTiempoOn * 0x0002DC6C0; //~1s ---> a 3Mhz
-    //TIMER32_1->LOAD = 10* 0x02DC6C00; //~1s ---> a 48Mhz
+    //////////////////////////////////////////////////////////////////////
+    // Configuracion del timer32_1 para el tiempo de encendido de la luz
+    TIMER32_1->LOAD = __frecuencyMultiplier * __Multiplier_On_Time * 0x0002DC6C0; //~1s ---> a 48Mhz
     TIMER32_1->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT1_IRQn,1);
     NVIC_EnableIRQ(T32_INT1_IRQn);
-    // Configuracion del timer de muestreo de luz (tambien se puede usar con el sonido)
+    // Configuracion del timer de muestreo del sonido
     // Cada periodo de tiempo se llama a la interrupcion T32_INT1_IRQHandler(void)
-    //TIMER32_2->LOAD = multi* 2* 0x0002DC6C0; //~1s ---> a 3Mhz
-    //TIMER32_2->LOAD = 2* 0x02DC6C00; //~1s ---> a 48Mhz
-    TIMER32_2->LOAD =  6000; //48000; //~Sampling 1kHz ---> a 48Mhz
+    TIMER32_2->LOAD =  6000; //48000; //~Sampling 8kHz ---> a 48Mhz
     TIMER32_2->CONTROL = TIMER32_CONTROL_SIZE | TIMER32_CONTROL_PRESCALE_0 | TIMER32_CONTROL_MODE | TIMER32_CONTROL_IE | TIMER32_CONTROL_ENABLE;
     NVIC_SetPriority(T32_INT2_IRQn,1);
     NVIC_EnableIRQ(T32_INT2_IRQn);
-    //
-    //TIMER_A0->R =  0x0000FFFF;
-    //uint16_t valores[5]; valores[0]=0xFFFF; valores[1]=0xFFFF;
-/*
-    TIMER_A0->R = 0x0;
-    //TIMER_A0->CTL =
-    TIMER_A0->CCR[0] =0xFFFF;
-
-    TA0CTL = TASSEL_2 | TAIE | MC_1;  // enable timerA0 interrupt, select MC up mode, Select SMCLK as timerclock
-
-    TA0CCTL0 = CCIE | CCIS_0 | OUTMOD_3;
-
-    TA0CCTL0 &= ~CAP;
-
-    TA0CCR1 = 0xFFFF;
-
-    TA0CCR0 = 0xFFFF;
-
-    TA0R = 0;
-
-    TA0IV = 0x02;
-
-    NVIC_SetPriority(TA0_0_IRQn,2);
-    //NVIC_EnableIRQ(TA0_0_IRQn);
-*/
-
-    ////
-    //Setup for optical sensor
+    ////////////////////////////
+    //Setup for optical sensor//
+    ////////////////////////////
     Init_I2C_GPIO();
     I2C_init();
     OPT3001_init();
@@ -131,22 +106,22 @@ void main( void )
     InitialSeptUpParameters();
     ///////////////////////////
     P2->OUT |= BIT0;
-    __delay_cycles(multi * 1500000);
+    __delay_cycles(__frecuencyMultiplier * 1500000);
     //__delay_cycles(48000000);
     P2->OUT &= ~BIT0;
-    __delay_cycles(multi * 1500000);
+    __delay_cycles(__frecuencyMultiplier * 1500000);
     //__delay_cycles(48000000);
     P2->OUT |= BIT0;
-    __delay_cycles(multi * 1500000);
+    __delay_cycles(__frecuencyMultiplier * 1500000);
     //__delay_cycles(48000000);
     P2->OUT &= ~BIT0;
-    __delay_cycles(multi * 1500000);
+    __delay_cycles(__frecuencyMultiplier * 1500000);
     //__delay_cycles(48000000);
     P2->OUT |= BIT0;
-    __delay_cycles(multi * 1500000);
+    __delay_cycles(__frecuencyMultiplier * 1500000);
     //__delay_cycles(48000000);
     P2->OUT &= ~BIT0;
-    __delay_cycles(multi * 1500000);
+    __delay_cycles(__frecuencyMultiplier * 1500000);
     //__delay_cycles(48000000);
     ///////////////////////////
     //    Get initial lux    //
@@ -154,7 +129,7 @@ void main( void )
     //lux = OPT3001_getLux();
     if (OPT3001_getLux() < g_iInitialUmbral)
     {
-        TIMER32_1->LOAD = multi * multiplicadorTiempoOn * 0x002DC6C0;
+        TIMER32_1->LOAD = __frecuencyMultiplier * __Multiplier_On_Time * 0x002DC6C0;
         TurnOnLight();
         g_bOutState = 1;
         g_bOffCondition = 0;
@@ -166,8 +141,7 @@ void main( void )
     {
         if(g_bOnCondition)
         {
-            TIMER32_1->LOAD = multi * multiplicadorTiempoOn * 0x002DC6C0;//Carga tiempo de espera minimo de luz encendida
-            //TIMER32_1->LOAD = 0xA * 0x02DC6C00;//48Mhz
+            TIMER32_1->LOAD = __frecuencyMultiplier * __Multiplier_On_Time * 0x002DC6C0;//Carga tiempo de espera minimo de luz encendida
             g_bOnCondition=0;
             g_bOutState =1;
             TurnOnLight();
